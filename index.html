@@ -1,0 +1,1108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6d6d6d; -webkit-text-stroke: #6d6d6d; background-color: #ecf1f7}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6d6d6d; -webkit-text-stroke: #6d6d6d; background-color: #ecf1f7; min-height: 16.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="zh-TW"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;3D 密室逃脫 - SDGs &amp; Food Bank&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- Firebase SDKs --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script type="module"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Firebase 設置與 Cloudflare 防呆保護</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const appId = typeof __app_id !== 'undefined' ? __app_id : 'escape-room-fps';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let firebaseConfig = null;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 💡 若要部署在 Cloudflare 等外部伺服器並使用排行榜，請取消下方註解並貼上您的 Firebase Config</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const externalFirebaseConfig = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// apiKey: "YOUR_API_KEY",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// authDomain: "YOUR_AUTH_DOMAIN",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// projectId: "YOUR_PROJECT_ID",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// storageBucket: "YOUR_STORAGE_BUCKET",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// messagingSenderId: "YOUR_SENDER_ID",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// appId: "YOUR_APP_ID"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>try {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (typeof __firebase_config !== 'undefined') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>firebaseConfig = JSON.parse(__firebase_config);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else if (Object.keys(externalFirebaseConfig).length &gt; 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>firebaseConfig = externalFirebaseConfig;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>} catch (e) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>console.error("Firebase config parsing error", e);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let app, auth, db;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let currentUser = null;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 安全初始化：只有在有合法設定檔時才啟動 Firebase，避免在 Cloudflare 上白畫面當機</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (firebaseConfig &amp;&amp; Object.keys(firebaseConfig).length &gt; 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>try {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>app = initializeApp(firebaseConfig);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>auth = getAuth(app);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>db = getFirestore(app);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const initAuth = async () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>try {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>if (typeof __initial_auth_token !== 'undefined' &amp;&amp; __initial_auth_token) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>await signInWithCustomToken(auth, __initial_auth_token);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>await signInAnonymously(auth);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>} catch (error) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>console.error("Auth error:", error);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>onAuthStateChanged(auth, (user) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>currentUser = user;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>initAuth();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} catch (err) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>console.error("Firebase 初始化失敗:", err);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>console.warn("未設定 Firebase Config，排行榜資料庫功能將被停用，但遊戲本體可正常遊玩。");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.db = db || null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.appId = appId;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.getCurrentUser = () =&gt; currentUser;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.collection = collection;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.getDocs = getDocs;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.addDoc = addDoc;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body { margin: 0; overflow: hidden; background-color: #000; touch-action: none; font-family: sans-serif; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#game-canvas { display: block; width: 100vw; height: 100vh; }</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* UI 層 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.pointer-events-auto { pointer-events: auto; }</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 十字準星 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#crosshair {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: absolute; top: 50%; left: 50%; width: 30px; height: 30px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%); pointer-events: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#crosshair::before {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>content: ''; position: absolute; top: 14px; left: 0; width: 30px; height: 2px; background: rgba(0, 255, 0, 0.8);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 4px rgba(0,0,0,0.8);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#crosshair::after {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>content: ''; position: absolute; top: 0; left: 14px; width: 2px; height: 30px; background: rgba(0, 255, 0, 0.8);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 4px rgba(0,0,0,0.8);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 手機控制區 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#move-zone { position: absolute; bottom: 10%; left: 5%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: auto; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#joystick { position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; background: rgba(255,255,255,0.5); border-radius: 50%; transform: translate(-50%, -50%); }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#look-zone { position: absolute; top: 0; right: 0; width: 50%; height: 100%; pointer-events: auto; }</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 射擊/互動按鈕 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#shoot-btn { position: absolute; bottom: 15%; right: 10%; width: 80px; height: 80px; background: rgba(52, 152, 219, 0.8); border: 3px solid #fff; border-radius: 50%; pointer-events: auto; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; user-select: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-align: center; line-height: 1.2; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#shoot-btn:active { background: rgba(41, 128, 185, 1); transform: scale(0.95); }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* HUD */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#hud { position: absolute; top: 3%; left: 3%; color: white; text-shadow: 1px 1px 2px black; font-size: 1.2rem; font-weight: bold; pointer-events: none; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.text-time { color: #ff6b6b; font-size: 1.5rem; }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 遊戲內即時題目橫幅 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#ingame-question { transition: opacity 0.5s ease-out; pointer-events: none; }</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 彈窗背景 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.modal-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 20; flex-direction: column; padding: 1rem; }</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 開始畫面專屬背景 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#start-screen {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-image: url('https://docs.google.com/drawings/d/e/2PACX-1vQPPWQTh_fn7USCSwnSkms5HTgYkzurIH14iH12320RVHsEvLZXwQgvHCuKxyTJcMnJNcJG1Fv6lpQb/pub?w=960&amp;h=720');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-size: cover;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-position: center;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-repeat: no-repeat;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.hidden { display: none !important; }</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 加深半透明背景以確保在圖文背景上文字仍清晰可見 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.glass-panel { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 1rem; padding: 2rem; color: white; text-align: center; max-width: 90%; width: 450px;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 3D 畫布 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;canvas id="game-canvas"&gt;&lt;/canvas&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- UI 控制與顯示 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="ui-layer"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="crosshair" class="hidden"&gt;&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 左上角資訊與時間 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="hud" class="hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="time-container" class="hidden text-time"&gt;Time: &lt;span id="hud-time"&gt;15&lt;/span&gt;s&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div&gt;Room: &lt;span id="hud-room"&gt;1&lt;/span&gt; / 10&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div&gt;Score: &lt;span id="hud-score"&gt;0&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="enemy-counter"&gt;Enemies: &lt;span id="hud-enemies"&gt;0&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 畫面上方中間的問題顯示 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="ingame-question" class="hidden absolute top-5 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-4 rounded-xl text-center border-2 border-yellow-400 w-11/12 max-w-lg shadow-lg"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h3 class="text-yellow-400 text-sm font-bold mb-1"&gt;使用十字準星瞄準，並開啟正確的門！&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p id="ingame-question-text" class="text-lg md:text-xl font-medium leading-relaxed"&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;!-- 手機操控區 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="move-zone" class="hidden"&gt;&lt;div id="joystick"&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="look-zone" class="hidden"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="shoot-btn" class="hidden"&gt;射出&lt;br&gt;弓箭&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 開始畫面 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="start-screen" class="modal-bg"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="glass-panel"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h1 class="text-3xl font-bold mb-4 text-green-400"&gt;食物守護者 3D&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="mb-6 text-sm text-gray-200 leading-relaxed text-left space-y-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;p&gt;1. 瞄準並&lt;strong class="text-blue-400"&gt;射擊&lt;/strong&gt;消滅所有的 &lt;strong&gt;SDGs目標牌子&lt;/strong&gt;。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;p&gt;2. 房間清空後，前方會出現三扇門，畫面上方顯示題目（&lt;strong class="text-red-400"&gt;15秒後消失&lt;/strong&gt;）。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;p&gt;3. 請用準星&lt;strong class="text-yellow-400"&gt;瞄準正確答案的門並射擊(或按空白鍵)開啟&lt;/strong&gt;！&lt;br&gt;&lt;span class="text-xs text-gray-400"&gt;(答錯2次將顯示提示與解析)&lt;/span&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;hr class="border-gray-600 my-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;p&gt;&lt;strong class="text-green-300"&gt;📱 手機版：&lt;/strong&gt;左下移動，右半部滑動視角，按鈕互動。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;p&gt;&lt;strong class="text-blue-300"&gt;💻 電腦版：&lt;/strong&gt;W/A/S/D 移動，方向鍵(↑↓←→)瞄準，空白鍵互動。&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="flex gap-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="btn-start-mobile" class="w-1/2 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white transition shadow-lg"&gt;📱 手機版&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="btn-start-pc" class="w-1/2 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold text-white transition shadow-lg"&gt;💻 電腦網頁版&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 答錯提示 (第1次) --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="wrong-modal" class="modal-bg hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="glass-panel border-red-500"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-2xl font-bold mb-2 text-red-500"&gt;答錯了！&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="mb-4"&gt;那不是正確的答案，扣 50 分！&lt;br&gt;請繼續嘗試其他門！&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="btn-retry" class="w-full py-2 bg-red-500 hover:bg-red-600 rounded-lg font-bold text-white transition"&gt;繼續&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 錯誤解析提示 (第2次錯) --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="explanation-modal" class="modal-bg hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="glass-panel border-yellow-500"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-2xl font-bold mb-2 text-yellow-400"&gt;錯誤達兩次！&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="text-lg mb-2 text-gray-200" id="exp-question"&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="mb-2 text-green-400 font-bold text-xl"&gt;正確選項是：&lt;span id="exp-answer"&gt;&lt;/span&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="bg-black/50 p-3 rounded text-sm text-gray-300 mb-4 text-left border border-gray-600"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;strong&gt;解析：&lt;/strong&gt;&lt;span id="exp-text"&gt;&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="btn-exp-ok" class="w-full py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-bold text-white transition"&gt;明白，前往開門&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 結束畫面與輸入名稱 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="end-screen" class="modal-bg hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="glass-panel"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-3xl font-bold mb-2 text-blue-400"&gt;遊戲通關！&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="mb-2"&gt;最終分數: &lt;span id="final-score" class="font-bold text-xl"&gt;&lt;/span&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p class="mb-6"&gt;花費時間: &lt;span id="final-time" class="font-bold"&gt;&lt;/span&gt; 秒&lt;/p&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="text" id="player-name" placeholder="輸入你的名字" class="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-400 text-center"&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="btn-submit-score" class="w-full py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-bold text-white transition"&gt;儲存並查看排行榜&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 排行榜 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="leaderboard-screen" class="modal-bg hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="glass-panel w-full max-w-md"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-2xl font-bold mb-4 text-purple-400"&gt;榮譽排行榜&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="leaderboard-list" class="flex flex-col gap-2 mb-6 max-h-60 overflow-y-auto text-sm text-left"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="text-center text-gray-400"&gt;載入中...&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="btn-restart" class="w-full py-2 bg-purple-500 hover:bg-purple-600 rounded-lg font-bold text-white transition"&gt;再玩一次&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script type="module"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 題庫與 SDGs 資料庫 (新增解析)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const questionsDB = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "Food banks collect food to help people who are ___.", options: ["hungry", "angry", "wealthy"], ans: 0, exp: "食物銀行(Food banks) 收集食物，主要目的是提供給正在面臨飢餓(hungry)或缺乏食物的人們。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "We should try to reduce food ___ to protect the environment.", options: ["taste", "waste", "rest"], ans: 1, exp: "減少食物浪費(food waste)有助於保護地球資源並減少溫室氣體的排放。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "A place where free food is given to people in need is called a food ___.", options: ["bank", "hospital", "school"], ans: 0, exp: "發放免費食物給弱勢族群的機構被稱為食物銀行(food bank)。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "SDG 2 aims to achieve '___ Hunger' by the year 2030.", options: ["Zero", "Hero", "Double"], ans: 0, exp: "聯合國永續發展目標第二項(SDG 2)的核心目標為「消除飢餓(Zero Hunger)」。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "Volunteers help to ___ the food into different boxes.", options: ["sort", "cook", "eat"], ans: 0, exp: "食物銀行的志工需要將募集來的各式食物進行分類(sort)，以便裝箱分送。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "Many supermarkets donate ___ food that is still safe to eat.", options: ["unsold", "broken", "toxic"], ans: 0, exp: "超市會捐出那些雖然未售出(unsold)但仍然安全且可食用的食物，避免浪費。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "Saving food can help reduce greenhouse gas ___.", options: ["emissions", "missions", "aliens"], ans: 0, exp: "腐爛的剩食會產生甲烷等溫室氣體。節約食物能減少溫室氣體排放(emissions)。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "A ___ diet includes enough vitamins and minerals for health.", options: ["balanced", "heavy", "quick"], ans: 0, exp: "均衡的飲食(balanced diet)包含足夠的維生素與礦物質，是維持健康的關鍵。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "It is important to check the 'best before' ___ on the package.", options: ["date", "time", "day"], ans: 0, exp: "包裝上的「賞味期限(best before date)」代表食品保持最佳品質的日期。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "By sharing extra food, we can create a better ___ for everyone.", options: ["future", "past", "history"], ans: 0, exp: "透過分享多餘的食物，我們能共同創造一個永續且更好的未來(future)。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "Instead of throwing away ugly fruits, we can make them into ___.", options: ["juice", "shoes", "cars"], ans: 0, exp: "外觀醜陋但不影響食用的水果(醜蔬果)，可以加工製成好喝的果汁(juice)或果醬。" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ q: "Food ___ occurs when food is lost during transportation.", options: ["loss", "cost", "boss"], ans: 0, exp: "食物在生產或運輸過程中損壞或遺失，被稱為糧食損失(Food loss)。" }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 加上 Icon 對應</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const sdgsList = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 1: No Poverty", icon: "🚫" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 2: Zero Hunger", icon: "🍚" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 3: Good Health", icon: "❤️" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 4: Quality Education", icon: "📚" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 5: Gender Equality", icon: "⚖️" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 6: Clean Water", icon: "💧" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 7: Clean Energy", icon: "☀️" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 8: Decent Work", icon: "💼" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 9: Industry &amp; Innovation", icon: "🏭" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 10: Reduced Inequalities", icon: "🤝" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 11: Sustainable Cities", icon: "🏙️" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 12: Responsible Consumption", icon: "♻️" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 13: Climate Action", icon: "🌍" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 14: Life Below Water", icon: "🐟" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 15: Life on Land", icon: "🌳" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 16: Peace &amp; Justice", icon: "🕊️" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{ text: "SDG 17: Partnerships", icon: "🤝" }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 遊戲狀態與變數</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let isPCMode = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let currentRoom = 1;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const totalRooms = 10;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let score = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let startTime = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let totalTime = 0;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let enemies = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let doors = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let isModalOpen = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let isQuestionPhase = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let wrongAttempts = 0; // 記錄錯題次數</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let currentQuestionObj = null;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 題目計時器</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let currentQuestionTimer = 15;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let isQuestionVisible = false;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Three.js 核心變數</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let scene, camera, renderer;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let pitchObject, yawObject;<span class="Apple-converted-space"> </span></span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let moveForward = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let moveRight = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const speed = 6.0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let prevTime = performance.now();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let touchLookX = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let touchLookY = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const lookSensitivity = 0.005;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 音效系統 (使用 Web Audio API 生成，免外部資源)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const AudioContext = window.AudioContext || window.webkitAudioContext;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let audioCtx;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function initAudio() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!audioCtx) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>audioCtx = new AudioContext();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (audioCtx.state === 'suspended') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>audioCtx.resume();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function playTone(freq, type, duration, vol=0.1) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if(!audioCtx) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const osc = audioCtx.createOscillator();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const gain = audioCtx.createGain();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.type = type;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.frequency.setValueAtTime(freq, audioCtx.currentTime);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gain.gain.setValueAtTime(vol, audioCtx.currentTime);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.connect(gain);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gain.connect(audioCtx.destination);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.start();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.stop(audioCtx.currentTime + duration);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function playShootSound() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if(!audioCtx) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const osc = audioCtx.createOscillator();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const gain = audioCtx.createGain();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.type = 'square';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.frequency.setValueAtTime(800, audioCtx.currentTime);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gain.gain.setValueAtTime(0.05, audioCtx.currentTime);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.connect(gain);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gain.connect(audioCtx.destination);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.start();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>osc.stop(audioCtx.currentTime + 0.1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function playDoorOpenSound() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 輕快的開門音效 (C5, E5, G5 和弦)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; playTone(523.25, 'sine', 0.4, 0.1), 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; playTone(659.25, 'sine', 0.4, 0.1), 100);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; playTone(783.99, 'sine', 0.6, 0.15), 200);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function playWrongSound() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>playTone(150, 'sawtooth', 0.4, 0.1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function playMozart() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>initAudio();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 莫札特小夜曲 (Eine kleine Nachtmusik) 片段約 5 秒鐘</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const notes = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 392.00, d: 0.3, t: 0 },<span class="Apple-converted-space">    </span>// G4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 293.66, d: 0.3, t: 0.5 },<span class="Apple-converted-space">  </span>// D4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 392.00, d: 0.3, t: 1.0 },<span class="Apple-converted-space">  </span>// G4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 293.66, d: 0.3, t: 1.5 },<span class="Apple-converted-space">  </span>// D4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 392.00, d: 0.3, t: 2.0 },<span class="Apple-converted-space">  </span>// G4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 493.88, d: 0.3, t: 2.3 },<span class="Apple-converted-space">  </span>// B4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 587.33, d: 0.6, t: 2.6 },<span class="Apple-converted-space">  </span>// D5</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 523.25, d: 0.3, t: 3.4 },<span class="Apple-converted-space">  </span>// C5</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 440.00, d: 0.3, t: 3.9 },<span class="Apple-converted-space">  </span>// A4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 523.25, d: 0.3, t: 4.4 },<span class="Apple-converted-space">  </span>// C5</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{ f: 440.00, d: 0.3, t: 4.9 },<span class="Apple-converted-space">  </span>// A4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>notes.forEach(n =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; playTone(n.f, 'triangle', n.d, 0.15), n.t * 1000);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 電腦版鍵盤狀態</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const keys = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>w: false, a: false, s: false, d: false,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 初始化 Three.js</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function initThree() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.getElementById('game-canvas');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer = new THREE.WebGLRenderer({ canvas, antialias: true });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.setSize(window.innerWidth, window.innerHeight);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.setPixelRatio(window.devicePixelRatio);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene = new THREE.Scene();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.background = new THREE.Color(0x111111);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.fog = new THREE.FogExp2(0x111111, 0.04);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>pitchObject = new THREE.Object3D();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>pitchObject.add(camera);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>yawObject = new THREE.Object3D();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>yawObject.position.y = 1.6;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>yawObject.add(pitchObject);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(yawObject);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ambientLight = new THREE.AmbientLight(0x404040, 1.2);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(ambientLight);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>dirLight.position.set(5, 10, 5);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(dirLight);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>window.addEventListener('resize', onWindowResize);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>buildRoomGeometry();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setupControls();</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>animate();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function buildRoomGeometry() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const floorGeo = new THREE.PlaneGeometry(20, 20);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const floorTex = createGridTexture();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const floorMat = new THREE.MeshLambertMaterial({ map: floorTex });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const floor = new THREE.Mesh(floorGeo, floorMat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>floor.rotation.x = -Math.PI / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(floor);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ceilMat = new THREE.MeshLambertMaterial({ color: 0x222222 });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ceil = new THREE.Mesh(floorGeo, ceilMat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ceil.rotation.x = Math.PI / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ceil.position.y = 4;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(ceil);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallGeo = new THREE.PlaneGeometry(20, 4);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallMat = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallN = new THREE.Mesh(wallGeo, wallMat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallN.position.set(0, 2, -10);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(wallN);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallS = new THREE.Mesh(wallGeo, wallMat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallS.position.set(0, 2, 10);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallS.rotation.y = Math.PI;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(wallS);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallE = new THREE.Mesh(wallGeo, wallMat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallE.position.set(10, 2, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallE.rotation.y = -Math.PI / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(wallE);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallW = new THREE.Mesh(wallGeo, wallMat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallW.position.set(-10, 2, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wallW.rotation.y = Math.PI / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(wallW);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function createGridTexture() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.createElement('canvas');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>canvas.width = 256; canvas.height = 256;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ctx = canvas.getContext('2d');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillStyle = '#1a1a1a'; ctx.fillRect(0, 0, 256, 256);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.strokeStyle = '#333333'; ctx.lineWidth = 4; ctx.strokeRect(0, 0, 256, 256);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const texture = new THREE.CanvasTexture(canvas);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>texture.repeat.set(10, 10);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return texture;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 建立 SDG 牌子紋理 (有 Emoji 圖示)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function createSDGTexture(sdgObj) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.createElement('canvas');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>canvas.width = 512;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>canvas.height = 512;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ctx = canvas.getContext('2d');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const text = sdgObj.text;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const icon = sdgObj.icon;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 背景與邊框</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillStyle = '#ffffff';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillRect(0, 0, 512, 512);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.strokeStyle = '#e74c3c';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.lineWidth = 20;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.strokeRect(0, 0, 512, 512);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 繪製 Emoji 圖示</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.textAlign = 'center';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.textBaseline = 'middle';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.font = '100px sans-serif'; // emoji 大小</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillText(icon, 256, 110);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const splitIndex = text.indexOf(': ');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if(splitIndex !== -1) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const title = text.substring(0, splitIndex);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const desc = text.substring(splitIndex + 2);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = '#c0392b';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.font = 'bold 45px sans-serif';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillText(title, 256, 220);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = '#2c3e50';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.font = 'bold 36px sans-serif';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const words = desc.split(' ');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let line = '';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let y = 300;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>for(let n = 0; n &lt; words.length; n++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>let testLine = line + words[n] + ' ';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>let metrics = ctx.measureText(testLine);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (metrics.width &gt; 420 &amp;&amp; n &gt; 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>ctx.fillText(line, 256, y);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>line = words[n] + ' ';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>y += 50;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>line = testLine;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillText(line, 256, y);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillStyle = '#2c3e50';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.font = 'bold 45px sans-serif';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>ctx.fillText(text, 256, 300);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return new THREE.CanvasTexture(canvas);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 建立門的選項紋理</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function createDoorTexture(text) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.createElement('canvas');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>canvas.width = 512;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>canvas.height = 1024;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ctx = canvas.getContext('2d');</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillStyle = '#8e44ad';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillRect(0, 0, 512, 1024);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.strokeStyle = '#732d91';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.lineWidth = 30;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.strokeRect(0, 0, 512, 1024);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillStyle = '#f1c40f';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.font = 'bold 80px sans-serif';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.textAlign = 'center';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.textBaseline = 'middle';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ctx.fillText(text, 256, 512);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return new THREE.CanvasTexture(canvas);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 控制器 (支援雙平台)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function setupControls() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const moveZone = document.getElementById('move-zone');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const joystick = document.getElementById('joystick');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const lookZone = document.getElementById('look-zone');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const shootBtn = document.getElementById('shoot-btn');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let moveTouchId = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let lookTouchId = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let moveStartX = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let moveStartY = 0;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>moveZone.addEventListener('touchstart', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (moveTouchId !== null) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const touch = e.changedTouches[0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>moveTouchId = touch.identifier;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const rect = moveZone.getBoundingClientRect();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>moveStartX = rect.left + rect.width / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>moveStartY = rect.top + rect.height / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>updateJoystick(touch.clientX, touch.clientY);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>moveZone.addEventListener('touchmove', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>for (let i=0; i&lt;e.changedTouches.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (e.changedTouches[i].identifier === moveTouchId) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const endMove = (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>for (let i=0; i&lt;e.changedTouches.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (e.changedTouches[i].identifier === moveTouchId) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>moveTouchId = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>joystick.style.transform = `translate(-50%, -50%)`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>moveForward = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>moveRight = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>moveZone.addEventListener('touchend', endMove);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>moveZone.addEventListener('touchcancel', endMove);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>function updateJoystick(x, y) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const dx = x - moveStartX; const dy = y - moveStartY;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const maxRadius = 50;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let distance = Math.sqrt(dx*dx + dy*dy);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let angle = Math.atan2(dy, dx);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (distance &gt; maxRadius) distance = maxRadius;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const handleX = distance * Math.cos(angle);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const handleY = distance * Math.sin(angle);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>joystick.style.transform = `translate(calc(-50% + ${handleX}px), calc(-50% + ${handleY}px))`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>moveRight = handleX / maxRadius;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>moveForward = handleY / maxRadius;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let lastLookX = 0; let lastLookY = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>lookZone.addEventListener('touchstart', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (lookTouchId !== null) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const touch = e.changedTouches[0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>lookTouchId = touch.identifier;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>lastLookX = touch.clientX; lastLookY = touch.clientY;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>lookZone.addEventListener('touchmove', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>for (let i=0; i&lt;e.changedTouches.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (e.changedTouches[i].identifier === lookTouchId &amp;&amp; !isModalOpen) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const deltaX = e.changedTouches[i].clientX - lastLookX;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const deltaY = e.changedTouches[i].clientY - lastLookY;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>yawObject.rotation.y -= deltaX * lookSensitivity;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>pitchObject.rotation.x -= deltaY * lookSensitivity;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>lastLookX = e.changedTouches[i].clientX;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>lastLookY = e.changedTouches[i].clientY;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const endLook = (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>for (let i=0; i&lt;e.changedTouches.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (e.changedTouches[i].identifier === lookTouchId) lookTouchId = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>lookZone.addEventListener('touchend', endLook);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>lookZone.addEventListener('touchcancel', endLook);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>shootBtn.addEventListener('touchstart', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (!isModalOpen) shoot();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 電腦版鍵盤事件</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>window.addEventListener('keydown', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isModalOpen || !isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const k = e.key;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'w' || k === 'W') keys.w = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'a' || k === 'A') keys.a = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 's' || k === 'S') keys.s = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'd' || k === 'D') keys.d = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowUp') keys.ArrowUp = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowDown') keys.ArrowDown = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowLeft') keys.ArrowLeft = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowRight') keys.ArrowRight = true;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// 空白鍵統一觸發射擊(或開門)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (e.code === 'Space' &amp;&amp; !isModalOpen) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e.preventDefault();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>shoot();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>window.addEventListener('keyup', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (!isPCMode) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const k = e.key;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'w' || k === 'W') keys.w = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'a' || k === 'A') keys.a = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 's' || k === 'S') keys.s = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'd' || k === 'D') keys.d = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowUp') keys.ArrowUp = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowDown') keys.ArrowDown = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowLeft') keys.ArrowLeft = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (k === 'ArrowRight') keys.ArrowRight = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 關卡與實體邏輯</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function loadRoom() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>yawObject.position.set(0, 1.6, 6);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>yawObject.rotation.y = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>pitchObject.rotation.x = 0;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>enemies.forEach(e =&gt; scene.remove(e.mesh));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>enemies = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>doors.forEach(d =&gt; scene.remove(d.mesh));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>doors = [];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isQuestionPhase = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isQuestionVisible = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>wrongAttempts = 0; // 重置錯題次數</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('shoot-btn').innerHTML = "射出&lt;br&gt;弓箭";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('shoot-btn').style.background = "rgba(52, 152, 219, 0.8)";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('ingame-question').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('ingame-question').style.opacity = '1';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('time-container').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('enemy-counter').classList.remove('hidden');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const count = Math.floor(Math.random() * 3) + 3;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const geo = new THREE.BoxGeometry(1.5, 1.5, 0.2);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for(let i=0; i&lt;count; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const randomSDGObj = sdgsList[Math.floor(Math.random() * sdgsList.length)];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const tex = createSDGTexture(randomSDGObj);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const mat = new THREE.MeshLambertMaterial({ map: tex });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const mesh = new THREE.Mesh(geo, mat);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>mesh.position.x = (Math.random() - 0.5) * 14;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>mesh.position.y = 1.2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>mesh.position.z = (Math.random() - 0.5) * -10 - 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>scene.add(mesh);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// 速度放慢 10 倍</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const baseSpeed = (0.8 + Math.random() * 0.7) / 10;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>enemies.push({</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>mesh: mesh,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>speed: baseSpeed</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>updateHUD();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 準星射擊 (敵人 / 開門 雙功能)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function shoot() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>initAudio(); // 確保音效已初始化</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>playShootSound(); // 播放射擊音效</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const raycaster = new THREE.Raycaster();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!isQuestionPhase) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// 射擊敵人</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const intersects = raycaster.intersectObjects(enemies.map(e =&gt; e.mesh));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (intersects.length &gt; 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const hitMesh = intersects[0].object;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const index = enemies.findIndex(e =&gt; e.mesh === hitMesh);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (index !== -1) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>scene.remove(hitMesh);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>enemies.splice(index, 1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>score += 10;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>updateHUD();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>if (enemies.length === 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>spawnDoors();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// 瞄準射擊開門</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const intersects = raycaster.intersectObjects(doors.map(d =&gt; d.mesh));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (intersects.length &gt; 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const hitMesh = intersects[0].object;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const doorData = doors.find(d =&gt; d.mesh === hitMesh);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (doorData.isCorrect) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>// 答對了</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>playDoorOpenSound(); // 播放開門音效</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>score += 100;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>currentRoom++;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>if (currentRoom &gt; totalRooms) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>endGame();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>loadRoom();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>// 答錯處理</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>playWrongSound(); // 播放錯誤音效</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>wrongAttempts++;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>score -= 50;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>updateHUD();</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>if (wrongAttempts &gt;= 2) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>// 錯了2次，顯示解析</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>showExplanationModal();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>showModal('wrong-modal');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function spawnDoors() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isQuestionPhase = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('enemy-counter').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('shoot-btn').innerHTML = "選擇&lt;br&gt;開門";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('shoot-btn').style.background = "rgba(155, 89, 182, 0.8)";</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 準備題目</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const q = questionsDB[Math.floor(Math.random() * questionsDB.length)];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>currentQuestionObj = q;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>currentQuestionTimer = 15;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isQuestionVisible = true;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const qBox = document.getElementById('ingame-question');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>qBox.classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>qBox.style.opacity = '1';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('ingame-question-text').innerText = q.q;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('time-container').classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('hud-time').innerText = "15";</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const doorPositions = [-5, 0, 5];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let optionIndices = [0, 1, 2];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>optionIndices.sort(() =&gt; Math.random() - 0.5);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; 3; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const optIndex = optionIndices[i];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const text = q.options[optIndex];</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const geo = new THREE.BoxGeometry(3, 4.5, 0.5);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const tex = createDoorTexture(text);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const mat = new THREE.MeshBasicMaterial({ map: tex });</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const mesh = new THREE.Mesh(geo, mat);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>mesh.position.set(doorPositions[i], 2.25, -9.5);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>scene.add(mesh);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>doors.push({ mesh, isCorrect: (optIndex === q.ans) });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function showExplanationModal() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('exp-question').innerText = currentQuestionObj.q;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('exp-answer').innerText = currentQuestionObj.options[currentQuestionObj.ans];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('exp-text').innerText = currentQuestionObj.exp;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>showModal('explanation-modal');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 主迴圈</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function animate() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>requestAnimationFrame(animate);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const time = performance.now();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const delta = (time - prevTime) / 1000;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>prevTime = time;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!isModalOpen) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isPCMode) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const rotSpeed = 1.8 * delta;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (keys.ArrowLeft) yawObject.rotation.y += rotSpeed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (keys.ArrowRight) yawObject.rotation.y -= rotSpeed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (keys.ArrowUp) pitchObject.rotation.x += rotSpeed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (keys.ArrowDown) pitchObject.rotation.x -= rotSpeed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>moveForward = (keys.s ? 1 : 0) - (keys.w ? 1 : 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>moveRight = (keys.d ? 1 : 0) - (keys.a ? 1 : 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isQuestionVisible &amp;&amp; isQuestionPhase) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>currentQuestionTimer -= delta;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (currentQuestionTimer &lt;= 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>currentQuestionTimer = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>isQuestionVisible = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>document.getElementById('ingame-question').style.opacity = '0';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>document.getElementById('hud-time').innerText = Math.ceil(currentQuestionTimer);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const direction = new THREE.Vector3();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const rotation = yawObject.rotation.y;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>direction.z = moveForward;<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>direction.x = moveRight;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// 阻止玩家靠太近門，以維持準星射擊的空間</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (isQuestionPhase &amp;&amp; yawObject.position.z + (direction.z * speed * delta) &lt; -5) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>// 不能再往前走</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>yawObject.position.addScaledVector(direction, speed * delta);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>yawObject.position.x = Math.max(-9, Math.min(9, yawObject.position.x));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>yawObject.position.z = Math.max(-9, Math.min(9, yawObject.position.z));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (!isQuestionPhase) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>enemies.forEach(e =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const dir = new THREE.Vector3();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>dir.subVectors(yawObject.position, e.mesh.position);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>dir.y = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>dir.normalize();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e.mesh.position.addScaledVector(dir, e.speed * delta);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e.mesh.lookAt(yawObject.position.x, e.mesh.position.y, yawObject.position.z);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.render(scene, camera);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function onWindowResize() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera.aspect = window.innerWidth / window.innerHeight;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera.updateProjectionMatrix();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.setSize(window.innerWidth, window.innerHeight);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// UI 管理</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function updateHUD() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('hud-room').innerText = currentRoom;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('hud-score').innerText = score;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('hud-enemies').innerText = enemies.length;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function showModal(id) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isModalOpen = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.modal-bg').forEach(el =&gt; el.classList.add('hidden'));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(id).classList.remove('hidden');</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('move-zone').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('look-zone').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('shoot-btn').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('crosshair').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('hud').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('ingame-question').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function hideModals() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isModalOpen = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.querySelectorAll('.modal-bg').forEach(el =&gt; el.classList.add('hidden'));</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!isPCMode) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('move-zone').classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('look-zone').classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('shoot-btn').classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('move-zone').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('look-zone').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('shoot-btn').classList.add('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 十字準星在兩種模式和階段下皆常駐開啟，以便瞄準開門或射擊</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('crosshair').classList.remove('hidden');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (isQuestionVisible &amp;&amp; isQuestionPhase) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('ingame-question').classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('hud').classList.remove('hidden');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function startGame() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>initAudio();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>playMozart(); // 遊戲開始時播放莫札特音樂5秒鐘</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>currentRoom = 1;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>score = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>startTime = Date.now();</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Object.keys(keys).forEach(k =&gt; keys[k] = false);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>hideModals();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>loadRoom();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('btn-start-mobile').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isPCMode = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>startGame();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('btn-start-pc').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isPCMode = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>startGame();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('btn-retry').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>hideModals();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 讀完解析後返回遊戲，讓玩家能清楚地去射擊正確的門</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('btn-exp-ok').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>hideModals();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function endGame() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>totalTime = Math.floor((Date.now() - startTime) / 1000);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('final-score').innerText = score;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('final-time').innerText = totalTime;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>showModal('end-screen');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Firebase 防呆保護</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// -----------------------------------------------------</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('btn-submit-score').addEventListener('click', async () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const name = document.getElementById('player-name').value.trim() || 'Anonymous';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const btn = document.getElementById('btn-submit-score');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>btn.innerText = '儲存中...';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>btn.disabled = true;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 若在外部平台且無提供資料庫設定，則不執行儲存</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!window.db) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>alert("目前未連結 Firebase 資料庫，無法儲存成績。若需使用請於程式碼中填寫 Config。");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fetchLeaderboard();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>try {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const user = window.getCurrentUser();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const colRef = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'leaderboard');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>await window.addDoc(colRef, {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>name: name,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>score: score,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>timeSpent: totalTime,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>date: new Date().toISOString()</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fetchLeaderboard();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} catch (err) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>console.error("Save score error:", err);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>alert("儲存失敗，請確認網路連線。");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fetchLeaderboard();<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>async function fetchLeaderboard() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>showModal('leaderboard-screen');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const listEl = document.getElementById('leaderboard-list');</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 若在外部平台且無提供資料庫設定，則不讀取</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!window.db) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>listEl.innerHTML = '&lt;div class="text-center text-gray-400"&gt;目前無資料庫連線，無法讀取排行榜。&lt;/div&gt;';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>listEl.innerHTML = '&lt;div class="text-center text-gray-400"&gt;載入中...&lt;/div&gt;';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>try {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const colRef = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'leaderboard');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const snap = await window.getDocs(colRef);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let records = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>snap.forEach(doc =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>records.push(doc.data());</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>records.sort((a, b) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (b.score === a.score) return a.timeSpent - b.timeSpent;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>return b.score - a.score;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>records = records.slice(0, 10);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>listEl.innerHTML = '';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (records.length === 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>listEl.innerHTML = '&lt;div class="text-center text-gray-400"&gt;尚無紀錄&lt;/div&gt;';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>records.forEach((r, idx) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const div = document.createElement('div');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>div.className = 'flex justify-between border-b border-gray-700 py-1';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>div.innerHTML = `</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;span class="w-8"&gt;${idx + 1}.&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;span class="flex-1 font-bold text-blue-300 truncate px-2"&gt;${r.name}&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;span class="w-16 text-right text-yellow-400"&gt;${r.score}&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;span class="w-16 text-right text-gray-400"&gt;${r.timeSpent}s&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>listEl.appendChild(div);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} catch (err) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>console.error("Fetch leaderboard error:", err);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>listEl.innerHTML = '&lt;div class="text-center text-red-400"&gt;無法載入排行榜&lt;/div&gt;';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('btn-restart').addEventListener('click', () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>startGame();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>initThree();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
